@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# DESCRIPTION
+# when user logs in, connect to the first unattached available session
+# if no session available, create a new one
+
+# VARS
+DATE=$(date +%H%M%S%d%m%y)
+TMUX=$(tmux ls)
+FREE_SESSIONS=$(tmux list-sessions | grep -v attached | wc -l)
+ATTACHED_SESSIONS=$(tmux ls | grep attached | wc -l)
+FIST_UNATTACHED_SESSION=$(tmux ls | grep -v attached | sed -n '1p' | awk -F":" '{print $1}')
+
+# INFO
+echo "TMUX unasigned sessions: $FREE_SESSIONS"
+echo "TMUX attached sessions: $ATTACHED_SESSIONS"
+echo "TMUX first unattached session ID: $FIST_UNATTACHED_SESSION"
+
+## DO SOME STUFF
+if [[ $TMUX == "failed to connect to server" ]] || [[ $FREE_SESSIONS == "0" ]]; then
+        tmux new-session -s $DATE
+else
+        tmux attach -t $FIST_UNATTACHED_SESSION
+fi
